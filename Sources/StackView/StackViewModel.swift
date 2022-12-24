@@ -25,11 +25,11 @@ public class StackViewModel: ViewModel, ObservableObject {
         push(viewModel)
     }
     
-    public func push<V>(_ viewModel: V) where V : StackableViewModel {
+    public func push<V>(_ viewModel: V, transition: AnyTransition = .move(edge: .bottom)) where V : StackableViewModel {
         
         var viewModel = viewModel
         viewModel.stackViewModel = self
-        let stackItem = StackItem(viewModel: viewModel, transition: .move(edge: .trailing), zIndex: Double(stack.count))
+        let stackItem = StackItem(viewModel: viewModel, transition: transition, zIndex: Double(stack.count))
         
         withAnimation {
 
@@ -64,6 +64,8 @@ public class StackViewModel: ViewModel, ObservableObject {
         }
     }
 }
+
+//MARK: - Types
 
 struct StackItem: Identifiable {
 
