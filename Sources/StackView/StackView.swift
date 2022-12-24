@@ -9,7 +9,8 @@ import SwiftUI
 
 public struct StackView: View {
 
-    @ObservedObject var viewModel: StackViewModel
+    @ObservedObject private var viewModel: StackViewModel
+    @Namespace private var namespace
 
     public init(viewModel: StackViewModel) {
         
@@ -22,7 +23,7 @@ public struct StackView: View {
             
             ForEach(viewModel.stack) { item in
 
-                createStackableView(item.viewModel)
+                createStackableView(item.viewModel, namespace: namespace)
                     .transition(item.transition)
                     .zIndex(item.zIndex)
             }
@@ -32,13 +33,13 @@ public struct StackView: View {
 
 extension StackView {
     
-    func createStackableView(_ viewModel: any StackableViewModel) -> some View {
+    func createStackableView(_ viewModel: any StackableViewModel, namespace: Namespace.ID) -> some View {
 
-        AnyView(createAnyStackableView(viewModel))
+        AnyView(createAnyStackableView(viewModel, namespace: namespace))
     }
     
-    func createAnyStackableView(_ viewModel: some StackableViewModel) -> any View {
+    func createAnyStackableView(_ viewModel: some StackableViewModel, namespace: Namespace.ID) -> any View {
         
-        viewModel.viewType.init(viewModel: viewModel)
+        viewModel.viewType.init(viewModel: viewModel, namespace: namespace)
     }
 }

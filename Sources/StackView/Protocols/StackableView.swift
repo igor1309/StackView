@@ -11,5 +11,5 @@ public protocol StackableView: View {
 
     associatedtype VM: StackableViewModel
     
-    init(viewModel: VM)
+    init(viewModel: VM, namespace: Namespace.ID)
 }
