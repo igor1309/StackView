@@ -22,10 +22,10 @@ public class StackViewModel: ViewModel, ObservableObject {
     public convenience init(viewModel: any StackableViewModel) {
         
         self.init(stack: [])
-        push(viewModel)
+        push(viewModel, style: .instant)
     }
     
-    public func push<V>(_ viewModel: V, transition: AnyTransition = .move(edge: .bottom)) where V : StackableViewModel {
+    public func push(_ viewModel: any StackableViewModel, transition: AnyTransition) {
         
         var viewModel = viewModel
         viewModel.stackViewModel = self
@@ -35,6 +35,11 @@ public class StackViewModel: ViewModel, ObservableObject {
 
             stack.append(stackItem)
         }
+    }
+    
+    public func push(_ viewModel: any StackableViewModel, style: TransitionStyle) {
+        
+        push(viewModel, transition: style.transition)
     }
     
     public func pop() {
@@ -67,10 +72,37 @@ public class StackViewModel: ViewModel, ObservableObject {
 
 //MARK: - Types
 
-struct StackItem: Identifiable {
+extension StackViewModel {
+    
+    struct StackItem: Identifiable {
+        
+        let id = UUID()
+        let viewModel: any StackableViewModel
+        var transition: AnyTransition
+        var zIndex: Double
+    }
+}
 
-    let id = UUID()
-    let viewModel: any StackableViewModel
-    var transition: AnyTransition
-    var zIndex: Double
+public extension StackViewModel {
+    
+    enum TransitionStyle {
+        
+        case sheet
+        case link
+        case alert
+        case opacity
+        case instant
+        
+        var transition: AnyTransition {
+            
+            switch self {
+            case .sheet: return .move(edge: .bottom)
+            case .link: return .move(edge: .trailing)
+            case .alert: return .asymmetric(insertion: .scale.animation(.interactiveSpring(response: 0.3, dampingFraction: 0.4, blendDuration: 0.25)), removal: .scale.combined(with: .opacity))
+            case .opacity: return .opacity
+            case .instant: return .opacity.animation(.linear(duration: 0.01))
+            }
+        }
+    }
+    
 }
